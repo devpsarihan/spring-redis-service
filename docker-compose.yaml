@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: 'postgres:16'
+    container_name: 'product-postgresql'
+    environment:
+      - 'POSTGRES_DB=PRODUCT'
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_USER=root'
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - spring-redis-service-network
+  redis:
+    image: 'redis:latest'
+    restart: always
+    container_name: 'product-redis'
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 20 1 --loglevel warning --requirepass password --timeout 60
+    networks:
+      - spring-redis-service-network
+  spring-redis-service:
+    image: spring-redis-service:latest
+    container_name: spring-redis-service
+    restart: on-failure
+    ports:
+      - 8080:8080
+    environment:
+      - 'POSTGRESQL_DB_URL=jdbc:postgresql://postgres:5432/PRODUCT'
+      - 'REDIS_DB=1'
+      - 'REDIS_PASSWORD=password'
+      - 'REDIS_TIMEOUT=6000'
+      - 'REDIS_DB_URL=redis://redis:6379'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - spring-redis-service-network
+
+volumes:
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  spring-redis-service-network:
+    driver: bridge

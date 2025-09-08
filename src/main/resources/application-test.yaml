@@ -1,0 +1,38 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: spring-redis-service
+  jpa:
+    defer-datasource-initialization: false
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost:5432/PRODUCT
+    username: root
+    password: password
+  data:
+    redis:
+      url: redis://localhost:6379
+      connect-timeout: 6000
+      database: 1
+      password: password
+  testcontainers:
+    enabled: true
+    reuse:
+      enabled: true
+
+springdoc:
+  api-docs:
+    version: openapi_3_0
+  swagger-ui:
+    path: /doc
+  info:
+    title: Spring Redis Service API
+    description: API documentation for the Spring Redis Service
+    version: 1.0.0
